@@ -1,59 +1,47 @@
-import * as React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
-import {Icon} from 'react-native-elements';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import * as React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import routes from "../constants/routes";
+import InitialScreen from "../screens/InitialScreen/InitialScreen";
+import TabScreen from "../screens/TabScreen";
+import Login from "../screens/Login/Login";
+import Dashboard from "../screens/Dashboard";
+import MyHealth from "../screens/MyHealth";
+import History from "../screens/History/History";
+import { screenOptions } from "./navigation-service";
 
-import routes from '../constants/routes';
-import {tabBarOptions} from './navigation-service';
-
-import DashboardRoutes from './stack-routes/dashboard-route';
-import MyHealthRoutes from './stack-routes/my-health-route';
-
-const Tab = createBottomTabNavigator();
-const dashboardTabOptions = {
-  tabBarIcon: ({color, size, focused}) => {
-    if (focused) {
-      return (
-        <Icon name="home" type="material-community" color={color} size={30} />
-      );
-    }
-    return (
-      <Icon
-        name="home-outline"
-        type="material-community"
-        color={color}
-        size={30}
-      />
-    );
-  },
-};
-
-const myHealthTabOptions = {
-  tabBarIcon: ({color, size, focused}) => {
-    if (focused) {
-      return <Icon name="ios-heart" type="ionicon" color={color} size={30} />;
-    }
-    return (
-      <Icon name="ios-heart-empty" type="ionicon" color={color} size={30} />
-    );
-  },
-};
+const Stack = createStackNavigator();
 
 export default function RouteContainer() {
   return (
     <NavigationContainer>
-      <Tab.Navigator tabBarOptions={tabBarOptions}>
-        <Tab.Screen
+      <Stack.Navigator screenOptions={screenOptions}>
+        <Stack.Screen
           name={routes.DASHBOARD}
-          component={DashboardRoutes}
-          options={dashboardTabOptions}
+          component={Dashboard}
+          options={{
+            animationEnabled: false,
+          }}
         />
-        <Tab.Screen
+        <Stack.Screen name={routes.InitialScreen} component={InitialScreen} />
+        <Stack.Screen name={routes.LOGIN} component={Login} />
+
+        <Stack.Screen
+          name={routes.HISTORY}
+          component={History}
+          options={{
+            animationEnabled: false,
+          }}
+        />
+        <Stack.Screen
           name={routes.MY_HEALTH}
-          component={MyHealthRoutes}
-          options={myHealthTabOptions}
+          component={MyHealth}
+          options={{
+            animationEnabled: false,
+          }}
         />
-      </Tab.Navigator>
+        {/* <Stack.Screen name={routes.TAB_SCREEN} component={TabScreen} /> */}
+      </Stack.Navigator>
     </NavigationContainer>
   );
 }

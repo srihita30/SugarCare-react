@@ -11,9 +11,20 @@ const InputComponent = props => {
     onChange,
     maxLength = 30,
     editable = true,
+    errorMessage,
     ...otherProps
   } = props;
   const renderLabel = () => {
+    if(errorMessage) {
+      return (
+        <Text style={[
+          styles.floatingLabel,
+          styles.bg_white,
+          styles.floatingLabel__active,
+          styles.floatingLabel__error
+        ]}>{errorMessage}</Text>
+      )
+    }
     return (
       <Text
         style={[
@@ -36,7 +47,7 @@ const InputComponent = props => {
         keyboardShouldPersistTaps="handled"
         maxLength={maxLength}
         placeholderTextColor={styles.placeholderTextColor.color}
-        placeholder={`Enter ${label}`}
+        // placeholder={`${label}`}
         labelStyle={styles.labelStyle}
         containerStyle={styles.containerStyle}
         inputContainerStyle={styles.inputContainerStyle}

@@ -3,5 +3,10 @@ export default {
 
   APP_STACK: 'APP_STACK',
   DASHBOARD: 'Dashboard',
-  MY_HEALTH: 'My Health',
+  MY_HEALTH: 'My Profile',
+  SUGAR_LEVEL: 'Sugar Levels',
+  HISTORY: 'History',
+  LOGIN: 'Login',
+  InitialScreen: 'InitialScreen',
+  TAB_SCREEN: 'Tab Screen'
 };

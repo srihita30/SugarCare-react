@@ -55,10 +55,16 @@ const styles = StyleSheet.create({
     // color: theme.color_white,
   },
   header: {
+    flexDirection: 'row',
+    paddingLeft: theme.gutter_width_medium,
+    paddingRight: theme.gutter_width_medium,
+    alignItems: 'center',
+    justifyContent: 'space-between',
     backgroundColor: theme.color_white,
   },
   headerLogo: {
-    height: '100%',
+    height: 50,
+    width: 160,
   },
 });
 

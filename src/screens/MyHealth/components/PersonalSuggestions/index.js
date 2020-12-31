@@ -70,7 +70,6 @@ export default class PersonalSuggestions extends Component {
 
   renderTip = ({item}) => {
     const {tip, detail} = item;
-    console.log('item', item);
     return (
       <ListItem
         key={tip}

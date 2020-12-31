@@ -60,6 +60,16 @@ const styles = StyleSheet.create({
     marginVertical: theme.gutter_width_base,
     paddingTop: theme.gutter_width_small,
   },
+  checkboxContainer: {
+    flexDirection: "row",
+    marginBottom: 20,
+  },
+  checkbox: {
+    alignSelf: "center",
+  },
+  label: {
+    margin: 8,
+  },
 });
 
 export default styles;

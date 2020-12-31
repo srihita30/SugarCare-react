@@ -64,6 +64,10 @@ export const border_radius_circle = 50;
 // LETTER SPACING
 export const ltr_spc_small = 0.3;
 
+export const color_status_green = "#18cfb0";
+export const color_status_red = "#FF5252";
+export const color_status_amber = "#FFC400";
+
 // GUTTER
 export const gutter_width_base = 15;
 export const gutter_width_tiny = 5;

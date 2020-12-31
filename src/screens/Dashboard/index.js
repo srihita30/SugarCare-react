@@ -5,12 +5,18 @@ import {
   ScrollView,
   RefreshControl,
   ActivityIndicator,
+  TouchableOpacity
 } from 'react-native';
+import * as theme from '../../styles/theme';
 
 import VideoPlayer from './components/VideoPlayer';
 import RecentVideos from './components/RecentVideos';
 import AllVideos from './components/AllVideos';
 import styles from './styles';
+import {Icon} from 'react-native-elements';
+import routes from '../../constants/routes';
+import LogoutModal from '../../components/LogoutModal/LogoutModal'
+import Footer from '../../components/Footer/Footer';
 
 // const API_URL_GET_VIDEOS = 'http://demo8992196.mockable.io/getVideos';
 const API_URL_GET_VIDEOS =
@@ -25,11 +31,22 @@ export default class Dashboard extends Component {
       isError: false,
       selectedVideoId: '',
     };
-
     this.fetchVideos();
   }
 
-  fetchVideos = () => {
+  componentDidMount() {
+    this.props.navigation.setOptions({
+      headerLeft: () => (
+        <TouchableOpacity style={styles.header_lha_icon}>
+          <Icon  onPress={()=>{
+            this.props.navigation.navigate(routes.MY_HEALTH)
+            }} name="account-circle" type="material-community" size={30}/>
+        </TouchableOpacity>
+      )
+    })
+  }
+
+  fetchVideos = () => {    
     this.setState({isLoadingVideos: true, selectedVideoId: ''});
     fetch(API_URL_GET_VIDEOS)
       .then(res => res.json())
@@ -54,9 +71,12 @@ export default class Dashboard extends Component {
     this.setState({selectedVideoId});
   };
 
+  closeModal = () => {
+    this.setState({...this.state,showLogoutModal: false})
+  }
+
   render() {
     const {isLoadingVideos, selectedVideoId, videos} = this.state;
-
     if (isLoadingVideos) {
       return (
         <View style={styles.container}>
@@ -80,6 +100,7 @@ export default class Dashboard extends Component {
           id={selectedVideoId}
           onClose={this.onVideoPlayerModalClose}
         />
+        <LogoutModal visible={this.state.showLogoutModal} closeModal={this.closeModal} navigation={this.props.navigation}/>
         <ScrollView
           showsVerticalScrollIndicator={false}
           refreshControl={
@@ -95,6 +116,7 @@ export default class Dashboard extends Component {
             data={videos}
           />
         </ScrollView>
+        <Footer focus={1} navigation={this.props.navigation}/>
       </View>
     );
   }

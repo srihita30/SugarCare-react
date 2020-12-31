@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
   inputStyle: {
     padding: theme.gutter_width_base,
     fontSize: theme.font_size_medium,
-    fontFamily: theme.font_family_alpha_sb,
+    fontFamily: theme.font_family_alpha_r,
     color: theme.color_black,
     letterSpacing: 1.5,
     borderRadius: theme.border_radius_rounded_small,

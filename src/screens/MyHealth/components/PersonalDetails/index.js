@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Text, View, ActivityIndicator, Alert} from 'react-native';
+import {Text, View, ActivityIndicator, Alert, CheckBox} from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 
 import Tile from '../../../../components/Tile';
@@ -11,6 +11,7 @@ import {
   USER_HEIGHT_FEET,
   USER_HEIGHT_INCH,
   USER_DETAIL_KEYS,
+  DIABATIC_STAGE, DIABATIC_STAGE_LIST
 } from '../../../../constants';
 
 import {saveUserInfo} from '../../../../firebase/util';
@@ -22,43 +23,61 @@ export default class PersonalDetails extends Component {
     super(props);
     this.state = {
       details: {
-        [USER_DETAIL_KEYS.TITLE]: USER_TITLES[0].value,
-        [USER_DETAIL_KEYS.HEIGHT_FT]: USER_HEIGHT_FEET[4].value,
-        [USER_DETAIL_KEYS.HEIGHT_IN]: USER_HEIGHT_INCH[0].value,
       },
       isData: false,
       isSaving: false,
+      name: '',
+      yearDiagnosed: '',
+      hyperTensionCheck: false,
+      cardiacSurgeryCheck: false,
+      isCardiacPatient: false,
+      mobile: ''
     };
     this.getFormData();
   }
 
-  getFormData = async () => {
-    let title = await AsyncStorage.getItem(USER_DETAIL_KEYS.TITLE);
-    let name = await AsyncStorage.getItem(USER_DETAIL_KEYS.NAME);
-    let mobile = await AsyncStorage.getItem(USER_DETAIL_KEYS.MOBILE);
-    let height_ft = await AsyncStorage.getItem(USER_DETAIL_KEYS.HEIGHT_FT);
-    let height_in = await AsyncStorage.getItem(USER_DETAIL_KEYS.HEIGHT_IN);
-    let weight = await AsyncStorage.getItem(USER_DETAIL_KEYS.WEIGHT);
+  componentDidMount(){
+    console.log('mounting the personal details')
+  }
 
-    if (!(title && name && mobile && height_ft && height_in && weight)) {
-      // No values
-      this.setState({
-        isData: false,
-      });
-    } else {
-      // Value
-      this.setState({
-        details: {
-          ...this.state.details,
-          [USER_DETAIL_KEYS.TITLE]: title,
-          [USER_DETAIL_KEYS.NAME]: name,
-          [USER_DETAIL_KEYS.MOBILE]: mobile,
-          [USER_DETAIL_KEYS.HEIGHT_FT]: height_ft,
-          [USER_DETAIL_KEYS.HEIGHT_IN]: height_in,
-          [USER_DETAIL_KEYS.WEIGHT]: weight,
-        },
-        isData: true,
-      });
+  onChangeHandler = (field, value) => {
+    this.setState({
+      ...this.state,
+      [field]: value
+    })
+  }
+
+  getFormData = async () => {
+    try{
+    let userDetails = await AsyncStorage.getItem(USER_DETAIL_KEYS.USER_DATA)
+    userDetails = JSON.parse(userDetails);
+    let title = userDetails.account.gender == "MALE" || userDetails.account.gender == null ? USER_TITLES[0].value : USER_TITLES[1].value;
+    let name = userDetails.lastName + ' ' + userDetails.firstName
+    let mobile = userDetails.phoneNumber
+
+    let height_ft = userDetails.account.heightInFeet > 0 ? USER_HEIGHT_FEET[userDetails.account.heightInFeet-1].value : USER_HEIGHT_FEET[4].value;
+    let height_in = userDetails.account.heightInInches > 0 ? USER_HEIGHT_INCH[userDetails.account.heightInInches].value : USER_HEIGHT_INCH[5].value;
+    let weight = userDetails.account.weight > 0 ? userDetails.account.weight : '';
+    this.setState({
+      ...this.state,
+      details: {
+        ...this.state.details,
+        [USER_DETAIL_KEYS.TITLE]: title,
+        [USER_DETAIL_KEYS.HEIGHT_FT]: height_ft,
+        [USER_DETAIL_KEYS.HEIGHT_IN]: height_in,
+        weight: weight+'',
+        diabeticStage: DIABATIC_STAGE_LIST[userDetails.account.diabeticStage] || 'Normal'
+      },
+      name,
+      age: userDetails.account.age ? userDetails.account.age+'' : '',
+      yearDiagnosed: userDetails.account.yearDetected,
+      hyperTensionCheck: userDetails.account.hasHyperTension,
+      cardiacSurgeryCheck: userDetails.account.cardiacSurgeryDone,
+      isCardiacPatient: userDetails.account.cardiacPatient,
+      mobile
+    });
+    } catch (e) {
+      console.log('exception in fetching data in personal details', e)
     }
   };
 
@@ -134,6 +153,20 @@ export default class PersonalDetails extends Component {
     });
   };
 
+  renderDiabeticStatus = () => {
+    const {details} = this.state;
+    return (
+      <View style={[styles.formGroup, styles.formGroup_half]}>
+        <Dropdown
+          items={DIABATIC_STAGE}
+          label="Diabetic Stage"
+          onChange={val => this.updateDetails('diabeticStage', val)}
+          value={details['diabeticStage']}
+        />
+      </View>
+    );
+  };
+
   renderTitle = () => {
     const {details} = this.state;
     return (
@@ -154,8 +187,9 @@ export default class PersonalDetails extends Component {
       <View style={styles.formGroup}>
         <Input
           label="Name"
-          onChange={val => this.updateDetails(USER_DETAIL_KEYS.NAME, val)}
-          value={details[USER_DETAIL_KEYS.NAME]}
+          // onChange={val => this.onChangeHandler('name', val)}
+          value = {this.state.name}
+          editable={false}
         />
       </View>
     );
@@ -169,8 +203,9 @@ export default class PersonalDetails extends Component {
           label="Mobile Number"
           keyboardType="numeric"
           maxLength={10}
-          onChange={val => this.updateDetails(USER_DETAIL_KEYS.MOBILE, val)}
-          value={details[USER_DETAIL_KEYS.MOBILE]}
+          // onChange={val => this.onChangeHandler('mobile', val)}
+          value={this.state.mobile}
+          editable={false}
         />
       </View>
     );
@@ -185,7 +220,7 @@ export default class PersonalDetails extends Component {
             items={USER_HEIGHT_FEET}
             label="Height (feet)"
             onChange={val =>
-              this.updateDetails(USER_DETAIL_KEYS.HEIGHT_FT, val)
+              this.updateDetails(USER_DETAIL_KEYS.HEIGHT_FT, val.split('')[0])
             }
             value={details[USER_DETAIL_KEYS.HEIGHT_FT]}
           />
@@ -195,7 +230,7 @@ export default class PersonalDetails extends Component {
             items={USER_HEIGHT_INCH}
             label="Height (inch)"
             onChange={val =>
-              this.updateDetails(USER_DETAIL_KEYS.HEIGHT_IN, val)
+              this.updateDetails(USER_DETAIL_KEYS.HEIGHT_IN, val.split(' ')[0])
             }
             value={details[USER_DETAIL_KEYS.HEIGHT_IN]}
           />
@@ -213,11 +248,70 @@ export default class PersonalDetails extends Component {
           keyboardType="numeric"
           maxLength={3}
           onChange={val => this.updateDetails(USER_DETAIL_KEYS.WEIGHT, val)}
-          value={details[USER_DETAIL_KEYS.WEIGHT]}
+          value={details.weight}
         />
       </View>
     );
   };
+
+  renderYearDiagnosed = () => {
+    return (
+      <View style={styles.formGroup}>
+        <Input
+          label="Year diagnosed"
+          keyboardType="numeric"
+          maxLength={4}
+          onChange={val => this.onChangeHandler('yearDiagnosed', val)}
+          value={this.state.yearDiagnosed}
+        />
+      </View>
+    )
+  }
+
+  renderAge = () => {
+    return (
+      <View style={styles.formGroup}>
+        <Input
+          label="Age"
+          keyboardType="numeric"
+          maxLength={3}
+          onChange={val => this.onChangeHandler('age', val)}
+          value={this.state.age}
+        />
+      </View>
+    )
+  }
+
+  renderHyperTensionCheck = () => {
+    return (
+      <>
+        <View style={styles.checkboxContainer}>
+          <CheckBox
+            value={this.state.hyperTensionCheck}
+            onValueChange={(val)=>this.onChangeHandler('hyperTensionCheck',val)}
+            style={styles.checkbox}
+          />
+          <Text style={styles.label}>Has hyper tension ?</Text>
+        </View>
+        <View style={styles.checkboxContainer}>
+          <CheckBox
+            value={this.state.isCardiacPatient}
+            onValueChange={(val)=>this.onChangeHandler('isCardiacPatient',val)}
+            style={styles.checkbox}
+          />
+          <Text style={styles.label}>Is a Cardiac Patient ?</Text>
+        </View>
+        <View style={styles.checkboxContainer}>
+          <CheckBox
+            value={this.state.cardiacSurgeryCheck}
+            onValueChange={(val)=>this.onChangeHandler('cardiacSurgeryCheck',val)}
+            style={styles.checkbox}
+          />
+          <Text style={styles.label}>Has undergone Cardiac surgery ?</Text>
+        </View>
+      </>
+    )
+  }
 
   renderEditForm = ({title, subtitle}) => {
     return (
@@ -225,12 +319,16 @@ export default class PersonalDetails extends Component {
         title={title}
         subtitle={subtitle}
         actionName="Save"
-        onPress={this.onSaveDetails}>
+        onPress={()=>this.props.handleSavePersonalDetails(this.state)}>
         {this.renderTitle()}
         {this.renderFullName()}
         {this.renderMobile()}
+        {this.renderAge()}
         {this.renderHeight()}
         {this.renderWeight()}
+        {this.renderYearDiagnosed()}
+        {this.renderDiabeticStatus()}
+        {this.renderHyperTensionCheck()}
       </Tile>
     );
   };
@@ -279,7 +377,6 @@ export default class PersonalDetails extends Component {
 
   render() {
     const {isData, isSaving} = this.state;
-
     if (isSaving) {
       return this.showLoader(MY_HEALTH_TILES.PERSONAL_DETAILS);
     }

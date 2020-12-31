@@ -34,6 +34,30 @@ export const MY_HEALTH_TILES = {
   },
 };
 
+export const DIABATIC_STAGE = [
+  {
+    value: 'Normal',
+  },
+  {
+    value: 'Pre Diabetic',
+  },
+  {
+    value: 'Diabetic',
+  },
+];
+
+export const DIABATIC_STAGE_CONSTANTS = {
+  'Normal' : 'NORMAL',
+  'Pre Diabetic': 'PREDIABETIC',
+  'Diabetic': 'DIABETIC'
+}
+
+export const DIABATIC_STAGE_LIST = {
+  'NORMAL': 'Normal',
+  'PREDIABETIC': 'Pre Diabetic',
+  'DIABETIC': 'Diabetic'
+}
+
 export const USER_TITLES = [
   {
     value: 'Mr',
@@ -119,6 +143,7 @@ export const USER_DETAIL_KEYS = {
   HEIGHT_FT: 'height_ft',
   HEIGHT_IN: 'height_in',
   WEIGHT: 'weight',
+  USER_DATA: 'userData'
 };
 
 export const USER_BMI_STATE = {
@@ -139,3 +164,17 @@ export const USER_BMI_STATE = {
     color: '#29ABF0',
   },
 };
+
+export const URL = {
+  REGISTER: 'http://13.212.24.76/user/register',
+  GET_USER_DETAILS: 'http://13.212.24.76/user/users/',
+  UPDATE_USER_DETAILS: 'http://13.212.24.76/account/accounts/',
+  LOGIN: 'http://13.212.24.76/user/login',
+  AUTHENTICATE: 'http://13.212.24.76/user/authenticate',
+  GET_SUGAR_DETAILS: 'http://13.212.24.76/user-daily-records/user/',
+  UPDATE_SUGAR_READINGS: 'http://13.212.24.76/user-daily-records/user/'
+}
+
+export const SESSION_DETAILS = {
+  TOKEN: 'token',
+}
